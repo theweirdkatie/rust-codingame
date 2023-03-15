@@ -15,21 +15,15 @@ fn main() {
     let mut inputs = String::new();
     let mut min_temp = (100, 100); // min temp, min diff
     io::stdin().read_line(&mut inputs).unwrap();
-    if n > 1 {
-        for i in inputs.split_whitespace() {
-            let t = parse_input!(i, i32);
-            let diff = (t-0).abs();
-            match diff.cmp(&min_temp.1) {
-                Ordering::Less => min_temp = (t, diff),
-                Ordering::Equal => if t >= 0 { min_temp = (t, diff) },
-                _ => (),
-            }
+    let temps = inputs.split_ascii_whitespace().map(|t| parse_input!(t,i32)).collect::<Vec<i32>>();
+    let min_temp = temps.into_iter().min_by(|&a,&b| {
+        match (0-a).abs().cmp(&(0-b).abs()){
+            // if equal, we want the GREATER temp, meaning reverse the returned ordering to MIN
+            Ordering::Equal => if a>b {Ordering::Less} else {Ordering::Greater},
+            ord => ord,
         }
-    } else if n==0 {
-        min_temp.0 = 0;
-    } else {
-        min_temp.0 = parse_input!(inputs, i32);
-    }
+    }).unwrap_or(0);
+    // default to 0 if no min
 
-    println!("{}", min_temp.0);
+    println!("{min_temp}");
 }
